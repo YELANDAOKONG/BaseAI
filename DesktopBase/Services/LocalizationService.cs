@@ -129,7 +129,11 @@ internal static class DefaultResources
         ""Temperature"": ""Temperature"",
         ""ClearChat"": ""Clear Chat"",
         ""UserMessage"": ""You"",
-        ""AIMessage"": ""AI""
+        ""AIMessage"": ""AI"",
+        ""SystemMessage"": ""System"",
+        ""StreamingMode"": ""Streaming Mode"",
+        ""ShowThinking"": ""Show Thinking"",
+        ""ThinkingMessage"": ""Thinking...""
       },
       ""Settings"": {
         ""Language"": ""Language"",
@@ -162,7 +166,11 @@ internal static class DefaultResources
         ""Temperature"": ""温度"",
         ""ClearChat"": ""清空对话"",
         ""UserMessage"": ""你"",
-        ""AIMessage"": ""AI""
+        ""AIMessage"": ""AI"",
+        ""SystemMessage"": ""系统"",
+        ""StreamingMode"": ""流式输出"",
+        ""ShowThinking"": ""显示思考过程"",
+        ""ThinkingMessage"": ""思考中...""
       },
       ""Settings"": {
         ""Language"": ""语言"",

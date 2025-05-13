@@ -17,5 +17,7 @@
         <converters:BooleanAndConverter x:Key="BooleanAndConverter"/>
         <converters:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
         <converters:MessageTypeToStringConverter x:Key="MessageTypeToStringConverter"/>
+        <converters:ThinkingOpacityConverter x:Key="ThinkingOpacityConverter"/>
     </Application.Resources>
+
 </Application>

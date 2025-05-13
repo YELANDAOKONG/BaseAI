@@ -26,6 +26,23 @@ public partial class ChatViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLoading;
     
+    [ObservableProperty]
+    private bool _isStreamingResponse;
+    
+    [ObservableProperty] 
+    private bool _showThinking;
+    
+    // I18n Text Properties
+    [ObservableProperty] private string _modelSettingsText = "Model Settings";
+    [ObservableProperty] private string _systemPromptLabelText = "System Prompt";
+    [ObservableProperty] private string _systemPromptPlaceholderText = "You are a helpful assistant...";
+    [ObservableProperty] private string _temperatureText = "Temperature";
+    [ObservableProperty] private string _clearChatText = "Clear Chat";
+    [ObservableProperty] private string _inputPlaceholderText = "Type your message here...";
+    [ObservableProperty] private string _sendText = "Send";
+    [ObservableProperty] private string _streamingModeText = "Streaming Mode";
+    [ObservableProperty] private string _showThinkingText = "Show Thinking";
+    
     public ObservableCollection<ChatMessage> Messages { get; } = new();
     
     public string ThemeClass => _themeService.GetThemeClass();
@@ -48,6 +65,30 @@ public partial class ChatViewModel : ViewModelBase
                 OnPropertyChanged(nameof(ThemeClass));
             }
         };
+        
+        _localizationService.PropertyChanged += (s, e) => 
+        {
+            if (e.PropertyName == nameof(LocalizationService.CurrentCulture))
+            {
+                UpdateLocalizedTexts();
+            }
+        };
+        
+        // Initial localization
+        UpdateLocalizedTexts();
+    }
+    
+    private void UpdateLocalizedTexts()
+    {
+        ModelSettingsText = _localizationService.GetString("Chat.ModelSettings");
+        SystemPromptLabelText = _localizationService.GetString("Chat.SystemPromptLabel");
+        SystemPromptPlaceholderText = _localizationService.GetString("Chat.SystemPromptPlaceholder");
+        TemperatureText = _localizationService.GetString("Chat.Temperature");
+        ClearChatText = _localizationService.GetString("Chat.ClearChat");
+        InputPlaceholderText = _localizationService.GetString("Chat.InputPlaceholder");
+        SendText = _localizationService.GetString("Chat.Send");
+        StreamingModeText = _localizationService.GetString("Chat.StreamingMode");
+        ShowThinkingText = _localizationService.GetString("Chat.ShowThinking");
     }
     
     [RelayCommand]
@@ -66,8 +107,48 @@ public partial class ChatViewModel : ViewModelBase
         
         try
         {
-            var response = await _aiService.SendMessageAsync(userInput, SystemPrompt);
-            Messages.Add(new ChatMessage(response, MessageType.AI));
+            if (IsStreamingResponse)
+            {
+                // Add an AI message that will be updated with streaming content
+                var aiMessage = new ChatMessage("", MessageType.AI);
+                Messages.Add(aiMessage);
+                
+                // If show thinking is enabled, first add a thinking message
+                ChatMessage? thinkingMessage = null;
+                if (ShowThinking)
+                {
+                    thinkingMessage = new ChatMessage("Thinking...", MessageType.System);
+                    thinkingMessage.IsThinking = true;
+                    Messages.Add(thinkingMessage);
+                }
+                
+                // Stream the response
+                await foreach (var chunk in _aiService.StreamMessageAsync(userInput, SystemPrompt))
+                {
+                    // If this is a thinking chunk, update the thinking message
+                    if (chunk.IsThinking && thinkingMessage != null)
+                    {
+                        thinkingMessage.Text = chunk.Text;
+                    }
+                    // Otherwise update the AI message
+                    else if (!chunk.IsThinking)
+                    {
+                        aiMessage.Text += chunk.Text;
+                    }
+                }
+                
+                // If there was thinking but no content, add a placeholder
+                if (thinkingMessage != null && string.IsNullOrEmpty(thinkingMessage.Text))
+                {
+                    thinkingMessage.Text = "(No thinking provided)";
+                }
+            }
+            else
+            {
+                // Standard non-streaming response
+                var response = await _aiService.SendMessageAsync(userInput, SystemPrompt);
+                Messages.Add(new ChatMessage(response, MessageType.AI));
+            }
         }
         catch (Exception ex)
         {
@@ -85,6 +166,12 @@ public partial class ChatViewModel : ViewModelBase
         Messages.Clear();
     }
     
+    [RelayCommand]
+    private void ToggleThinking()
+    {
+        ShowThinking = !ShowThinking;
+    }
+    
     // Update AI settings when they change
     public void UpdateSettings()
     {
@@ -93,19 +180,4 @@ public partial class ChatViewModel : ViewModelBase
         settings.Temperature = Temperature;
         _aiService.UpdateSettings(settings);
     }
-    
-    public string GetLocalizedString(string key) => _localizationService.GetString(key);
-
-    #region Localization
-
-    public string ModelSettingsText => GetLocalizedString("Chat.ModelSettings");
-    public string SystemPromptLabelText => GetLocalizedString("Chat.SystemPromptLabel");
-    public string SystemPromptPlaceholderText => GetLocalizedString("Chat.SystemPromptPlaceholder");
-    public string TemperatureText => GetLocalizedString("Chat.Temperature");
-    public string ClearChatText => GetLocalizedString("Chat.ClearChat");
-    public string InputPlaceholderText => GetLocalizedString("Chat.InputPlaceholder");
-    public string SendText => GetLocalizedString("Chat.Send");
-
-    #endregion
-    
 }
