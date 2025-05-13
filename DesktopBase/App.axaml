@@ -13,9 +13,9 @@
     </Application.Styles>
     
     <Application.Resources>
-        <converters:MessageTypeToStringConverter x:Key="MessageTypeToStringConverter"/>
         <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter"/>
         <converters:BooleanAndConverter x:Key="BooleanAndConverter"/>
         <converters:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
+        <converters:MessageTypeToStringConverter x:Key="MessageTypeToStringConverter"/>
     </Application.Resources>
 </Application>

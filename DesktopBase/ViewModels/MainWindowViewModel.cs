@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using DesktopBase.Services;
 using DesktopBase.Models;
+using System;
 
 namespace DesktopBase.ViewModels;
 
@@ -15,6 +16,9 @@ public partial class MainWindowViewModel : ViewModelBase
     
     [ObservableProperty]
     private string _title = "AI Assistant";
+    
+    public string ChatTabText => _localizationService.GetString("App.Chat");
+    public string SettingsTabText => _localizationService.GetString("App.Settings");
     
     public ChatViewModel ChatViewModel { get; }
     public SettingsViewModel SettingsViewModel { get; }
@@ -30,12 +34,14 @@ public partial class MainWindowViewModel : ViewModelBase
         // Default to chat page
         _currentPage = ChatViewModel;
         
-        // Update the title when language changes
+        // Update the title and tab text when language changes
         _localizationService.PropertyChanged += (s, e) => 
         {
             if (e.PropertyName == nameof(LocalizationService.CurrentCulture))
             {
                 Title = _localizationService.GetString("App.Title");
+                OnPropertyChanged(nameof(ChatTabText));
+                OnPropertyChanged(nameof(SettingsTabText));
             }
         };
     }

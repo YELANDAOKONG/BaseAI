@@ -24,9 +24,9 @@
         <!-- Navigation Bar -->
         <Border Classes="light" Padding="10">
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Content="Chat" Command="{Binding OpenChatCommand}" 
+                <Button Content="{Binding ChatTabText}" Command="{Binding OpenChatCommand}" 
                         Classes="light"/>
-                <Button Content="Settings" Command="{Binding OpenSettingsCommand}" 
+                <Button Content="{Binding SettingsTabText}" Command="{Binding OpenSettingsCommand}" 
                         Classes="light"/>
             </StackPanel>
         </Border>

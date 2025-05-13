@@ -13,7 +13,7 @@ public class MessageTypeToStringConverter : IValueConverter
         {
             return messageType switch
             {
-                MessageType.User => "You",
+                MessageType.User => "User",
                 MessageType.AI => "AI",
                 MessageType.System => "System",
                 _ => string.Empty

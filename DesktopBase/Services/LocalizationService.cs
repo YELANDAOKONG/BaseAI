@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Text.Json;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DesktopBase.Services;
 
 public class LocalizationService : INotifyPropertyChanged
 {
-    private Dictionary<string, Dictionary<string, object>> _resources = new();
+    private readonly Dictionary<string, Dictionary<string, object>> _resources = new();
     private string _currentCulture = "en";
     
     public string CurrentCulture
@@ -36,106 +36,39 @@ public class LocalizationService : INotifyPropertyChanged
     
     public async Task InitializeAsync()
     {
-        try 
+        try
         {
-            Directory.CreateDirectory("Assets/Localization");
+            // Create default resources in memory
+            _resources["en"] = JsonSerializer.Deserialize<Dictionary<string, object>>(DefaultResources.English) ?? new();
+            _resources["zh-CN"] = JsonSerializer.Deserialize<Dictionary<string, object>>(DefaultResources.Chinese) ?? new();
             
-            if (!File.Exists("Assets/Localization/en.json"))
+            // Try to load from files if they exist
+            var localizationDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Localization");
+            
+            if (Directory.Exists(localizationDir))
             {
-                var defaultEnglish = CreateDefaultEnglishResource();
-                File.WriteAllText("Assets/Localization/en.json", defaultEnglish);
+                var enFile = Path.Combine(localizationDir, "en.json");
+                var zhFile = Path.Combine(localizationDir, "zh-CN.json");
+                
+                if (File.Exists(enFile))
+                {
+                    var enJson = await File.ReadAllTextAsync(enFile);
+                    _resources["en"] = JsonSerializer.Deserialize<Dictionary<string, object>>(enJson) ?? _resources["en"];
+                }
+                
+                if (File.Exists(zhFile))
+                {
+                    var zhJson = await File.ReadAllTextAsync(zhFile);
+                    _resources["zh-CN"] = JsonSerializer.Deserialize<Dictionary<string, object>>(zhJson) ?? _resources["zh-CN"];
+                }
             }
-            
-            if (!File.Exists("Assets/Localization/zh-CN.json"))
-            {
-                var defaultChinese = CreateDefaultChineseResource();
-                File.WriteAllText("Assets/Localization/zh-CN.json", defaultChinese);
-            }
-            
-            var enJson = await File.ReadAllTextAsync("Assets/Localization/en.json");
-            _resources["en"] = JsonSerializer.Deserialize<Dictionary<string, object>>(enJson) ?? new();
-            
-            var zhJson = await File.ReadAllTextAsync("Assets/Localization/zh-CN.json");
-            _resources["zh-CN"] = JsonSerializer.Deserialize<Dictionary<string, object>>(zhJson) ?? new();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading localization files: {ex.Message}");
-            _resources["en"] = JsonSerializer.Deserialize<Dictionary<string, object>>(CreateDefaultEnglishResource()) ?? new();
-            _resources["zh-CN"] = JsonSerializer.Deserialize<Dictionary<string, object>>(CreateDefaultChineseResource()) ?? new();
+            // Log exception but don't crash
+            Console.WriteLine($"Error loading localization resources: {ex.Message}");
+            // Resources already loaded from embedded defaults
         }
-    }
-    
-    private string CreateDefaultEnglishResource()
-    {
-        return @"{
-          ""App"": {
-            ""Title"": ""AI Assistant"",
-            ""Settings"": ""Settings"",
-            ""Chat"": ""Chat""
-          },
-          ""Chat"": {
-            ""InputPlaceholder"": ""Type your message here..."",
-            ""Send"": ""Send"",
-            ""SystemPromptLabel"": ""System Prompt"",
-            ""SystemPromptPlaceholder"": ""You are a helpful assistant..."",
-            ""ModelSettings"": ""Model Settings"",
-            ""Temperature"": ""Temperature"",
-            ""ClearChat"": ""Clear Chat"",
-            ""UserMessage"": ""You"",
-            ""AIMessage"": ""AI""
-          },
-          ""Settings"": {
-            ""Language"": ""Language"",
-            ""English"": ""English"",
-            ""Chinese"": ""Chinese"",
-            ""Theme"": ""Theme"",
-            ""Light"": ""Light"",
-            ""Dark"": ""Dark"",
-            ""APISettings"": ""API Settings"",
-            ""ApiKey"": ""API Key"",
-            ""ApiKeyPlaceholder"": ""Enter your API key"",
-            ""ModelType"": ""Model Type"",
-            ""MaxTokens"": ""Max Tokens"",
-            ""Save"": ""Save""
-          }
-        }";
-    }
-    
-    private string CreateDefaultChineseResource()
-    {
-        return @"{
-          ""App"": {
-            ""Title"": ""AI 助手"",
-            ""Settings"": ""设置"",
-            ""Chat"": ""对话""
-          },
-          ""Chat"": {
-            ""InputPlaceholder"": ""在此输入您的消息..."",
-            ""Send"": ""发送"",
-            ""SystemPromptLabel"": ""系统提示词"",
-            ""SystemPromptPlaceholder"": ""你是一个有帮助的助手..."",
-            ""ModelSettings"": ""模型设置"",
-            ""Temperature"": ""温度"",
-            ""ClearChat"": ""清空对话"",
-            ""UserMessage"": ""你"",
-            ""AIMessage"": ""AI""
-          },
-          ""Settings"": {
-            ""Language"": ""语言"",
-            ""English"": ""英文"",
-            ""Chinese"": ""中文"",
-            ""Theme"": ""主题"",
-            ""Light"": ""明亮"",
-            ""Dark"": ""暗黑"",
-            ""APISettings"": ""API 设置"",
-            ""ApiKey"": ""API 密钥"",
-            ""ApiKeyPlaceholder"": ""输入您的 API 密钥"",
-            ""ModelType"": ""模型类型"",
-            ""MaxTokens"": ""最大令牌数"",
-            ""Save"": ""保存""
-          }
-        }";
     }
     
     public void SetCulture(string culture)
@@ -176,4 +109,74 @@ public class LocalizationService : INotifyPropertyChanged
             return key;
         }
     }
+}
+
+// Default resources embedded in code to ensure the app always works
+internal static class DefaultResources
+{
+    public static string English => @"{
+      ""App"": {
+        ""Title"": ""AI Assistant"",
+        ""Settings"": ""Settings"",
+        ""Chat"": ""Chat""
+      },
+      ""Chat"": {
+        ""InputPlaceholder"": ""Type your message here..."",
+        ""Send"": ""Send"",
+        ""SystemPromptLabel"": ""System Prompt"",
+        ""SystemPromptPlaceholder"": ""You are a helpful assistant..."",
+        ""ModelSettings"": ""Model Settings"",
+        ""Temperature"": ""Temperature"",
+        ""ClearChat"": ""Clear Chat"",
+        ""UserMessage"": ""You"",
+        ""AIMessage"": ""AI""
+      },
+      ""Settings"": {
+        ""Language"": ""Language"",
+        ""English"": ""English"",
+        ""Chinese"": ""Chinese"",
+        ""Theme"": ""Theme"",
+        ""Light"": ""Light"",
+        ""Dark"": ""Dark"",
+        ""APISettings"": ""API Settings"",
+        ""ApiKey"": ""API Key"",
+        ""ApiKeyPlaceholder"": ""Enter your API key"",
+        ""ModelType"": ""Model Type"",
+        ""MaxTokens"": ""Max Tokens"",
+        ""Save"": ""Save""
+      }
+    }";
+
+    public static string Chinese => @"{
+      ""App"": {
+        ""Title"": ""AI 助手"",
+        ""Settings"": ""设置"",
+        ""Chat"": ""对话""
+      },
+      ""Chat"": {
+        ""InputPlaceholder"": ""在此输入您的消息..."",
+        ""Send"": ""发送"",
+        ""SystemPromptLabel"": ""系统提示词"",
+        ""SystemPromptPlaceholder"": ""你是一个有帮助的助手..."",
+        ""ModelSettings"": ""模型设置"",
+        ""Temperature"": ""温度"",
+        ""ClearChat"": ""清空对话"",
+        ""UserMessage"": ""你"",
+        ""AIMessage"": ""AI""
+      },
+      ""Settings"": {
+        ""Language"": ""语言"",
+        ""English"": ""英文"",
+        ""Chinese"": ""中文"",
+        ""Theme"": ""主题"",
+        ""Light"": ""明亮"",
+        ""Dark"": ""暗黑"",
+        ""APISettings"": ""API 设置"",
+        ""ApiKey"": ""API 密钥"",
+        ""ApiKeyPlaceholder"": ""输入您的 API 密钥"",
+        ""ModelType"": ""模型类型"",
+        ""MaxTokens"": ""最大令牌数"",
+        ""Save"": ""保存""
+      }
+    }";
 }

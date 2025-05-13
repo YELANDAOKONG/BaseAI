@@ -28,7 +28,7 @@
               <Border Margin="10" Padding="10" CornerRadius="5"
                       Classes="light">
                 <StackPanel>
-                  <TextBlock Text="{Binding Type}" 
+                  <TextBlock Text="{Binding Type, Converter={StaticResource MessageTypeToStringConverter}}" 
                              FontWeight="Bold" Margin="0,0,0,5"/>
                   <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
                   <TextBlock Text="{Binding Timestamp, StringFormat=\{0:t\}}" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0"/>
@@ -43,13 +43,13 @@
     <!-- Settings Panel -->
     <Border Classes="light" Grid.Row="0" Grid.Column="1" BorderThickness="1,0,0,0" BorderBrush="#20000000">
       <StackPanel Margin="10">
-        <TextBlock Text="Model Settings" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Text="{Binding ModelSettingsText}" FontWeight="Bold" Margin="0,0,0,10"/>
         
-        <TextBlock Text="System Prompt" Margin="0,10,0,5"/>
+        <TextBlock Text="{Binding SystemPromptLabelText}" Margin="0,10,0,5"/>
         <TextBox Text="{Binding SystemPrompt}" AcceptsReturn="True" TextWrapping="Wrap" Height="100"
-                Classes="light" Watermark="You are a helpful assistant..."/>
+                Classes="light" Watermark="{Binding SystemPromptPlaceholderText}"/>
         
-        <TextBlock Text="Temperature" Margin="0,10,0,5"/>
+        <TextBlock Text="{Binding TemperatureText}" Margin="0,10,0,5"/>
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -60,7 +60,7 @@
           <TextBlock Grid.Column="1" Text="{Binding Temperature, StringFormat=\{0:F1\}}" VerticalAlignment="Center" Margin="10,0,0,0"/>
         </Grid>
         
-        <Button Command="{Binding ClearChatCommand}" Content="Clear Chat" 
+        <Button Command="{Binding ClearChatCommand}" Content="{Binding ClearChatText}" 
                 HorizontalAlignment="Stretch" Margin="0,20,0,0" Classes="light"/>
       </StackPanel>
     </Border>
@@ -73,11 +73,11 @@
       </Grid.ColumnDefinitions>
       
       <TextBox Text="{Binding InputText}" Classes="light"
-               Watermark="Type your message here..." AcceptsReturn="True"
+               Watermark="{Binding InputPlaceholderText}" AcceptsReturn="True"
                TextWrapping="Wrap" MinHeight="50"/>
       
       <Button Grid.Column="1" Command="{Binding SendMessageCommand}" 
-              Content="Send" VerticalAlignment="Bottom"
+              Content="{Binding SendText}" VerticalAlignment="Bottom"
               Margin="10,0,0,0" Classes="light">
         <Button.IsEnabled>
           <MultiBinding Converter="{StaticResource BooleanAndConverter}">

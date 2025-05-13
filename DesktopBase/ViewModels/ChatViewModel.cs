@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using DesktopBase.Models;
 using DesktopBase.Services;
+using System;
 
 namespace DesktopBase.ViewModels;
 
@@ -40,7 +41,13 @@ public partial class ChatViewModel : ViewModelBase
         SystemPrompt = settings.SystemPrompt;
         Temperature = settings.Temperature;
         
-        _themeService.ThemeChanged += (s, e) => OnPropertyChanged(nameof(ThemeClass));
+        _themeService.PropertyChanged += (s, e) => 
+        {
+            if (e.PropertyName == nameof(ThemeService.CurrentTheme))
+            {
+                OnPropertyChanged(nameof(ThemeClass));
+            }
+        };
     }
     
     [RelayCommand]
@@ -61,6 +68,10 @@ public partial class ChatViewModel : ViewModelBase
         {
             var response = await _aiService.SendMessageAsync(userInput, SystemPrompt);
             Messages.Add(new ChatMessage(response, MessageType.AI));
+        }
+        catch (Exception ex)
+        {
+            Messages.Add(new ChatMessage($"An error occurred: {ex.Message}", MessageType.System));
         }
         finally
         {
@@ -83,5 +94,18 @@ public partial class ChatViewModel : ViewModelBase
         _aiService.UpdateSettings(settings);
     }
     
-    public string Loc(string key) => _localizationService.GetString(key);
+    public string GetLocalizedString(string key) => _localizationService.GetString(key);
+
+    #region Localization
+
+    public string ModelSettingsText => GetLocalizedString("Chat.ModelSettings");
+    public string SystemPromptLabelText => GetLocalizedString("Chat.SystemPromptLabel");
+    public string SystemPromptPlaceholderText => GetLocalizedString("Chat.SystemPromptPlaceholder");
+    public string TemperatureText => GetLocalizedString("Chat.Temperature");
+    public string ClearChatText => GetLocalizedString("Chat.ClearChat");
+    public string InputPlaceholderText => GetLocalizedString("Chat.InputPlaceholder");
+    public string SendText => GetLocalizedString("Chat.Send");
+
+    #endregion
+    
 }

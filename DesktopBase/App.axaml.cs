@@ -18,10 +18,12 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
         
+        // Register services
         services.AddSingleton<ThemeService>();
         services.AddSingleton<LocalizationService>();
         services.AddSingleton<IAIService, MockAIService>();
         
+        // Register view models
         services.AddTransient<MainWindowViewModel>();
         
         _serviceProvider = services.BuildServiceProvider();
@@ -32,18 +34,36 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override async void OnFrameworkInitializationCompleted()
+    public override void OnFrameworkInitializationCompleted()
     {
-        var localizationService = _serviceProvider.GetRequiredService<LocalizationService>();
-        await localizationService.InitializeAsync();
-        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Initialize localization service
+            var localizationService = _serviceProvider.GetRequiredService<LocalizationService>();
+            
+            // Create main view model and window
             var mainViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
-            desktop.MainWindow = new MainWindow
+            var mainWindow = new MainWindow { DataContext = mainViewModel };
+            desktop.MainWindow = mainWindow;
+            
+            // Start initialization in background
+            Task.Run(async () =>
             {
-                DataContext = mainViewModel
-            };
+                try
+                {
+                    await localizationService.InitializeAsync();
+                    // Dispatch UI updates back to UI thread
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        mainViewModel.Title = localizationService.GetString("App.Title");
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error initializing application: {ex.Message}");
+                    // TODO: Add proper error logging
+                }
+            });
         }
 
         base.OnFrameworkInitializationCompleted();
