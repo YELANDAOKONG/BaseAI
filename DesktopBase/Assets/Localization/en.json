@@ -1,0 +1,32 @@
+{
+  "App": {
+    "Title": "AI Assistant",
+    "Settings": "Settings",
+    "Chat": "Chat"
+  },
+  "Chat": {
+    "InputPlaceholder": "Type your message here...",
+    "Send": "Send",
+    "SystemPromptLabel": "System Prompt",
+    "SystemPromptPlaceholder": "You are a helpful assistant...",
+    "ModelSettings": "Model Settings",
+    "Temperature": "Temperature",
+    "ClearChat": "Clear Chat",
+    "UserMessage": "You",
+    "AIMessage": "AI"
+  },
+  "Settings": {
+    "Language": "Language",
+    "English": "English",
+    "Chinese": "Chinese",
+    "Theme": "Theme",
+    "Light": "Light",
+    "Dark": "Dark",
+    "APISettings": "API Settings",
+    "ApiKey": "API Key",
+    "ApiKeyPlaceholder": "Enter your API key",
+    "ModelType": "Model Type",
+    "MaxTokens": "Max Tokens",
+    "Save": "Save"
+  }
+}

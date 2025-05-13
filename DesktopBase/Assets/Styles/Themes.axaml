@@ -1,0 +1,45 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  
+    <Style Selector="Control.light">
+        <Setter Property="TextBlock.Foreground" Value="#212121"/>
+    </Style>
+    <Style Selector="Border.light">
+        <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+    <Style Selector="TextBox.light">
+        <Setter Property="Background" Value="#FFFFFF"/>
+        <Setter Property="Foreground" Value="#212121"/>
+    </Style>
+    <Style Selector="Button.light">
+        <Setter Property="Background" Value="#2196F3"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+    </Style>
+    <Style Selector="Border.userMessage.light">
+        <Setter Property="Background" Value="#E3F2FD"/>
+    </Style>
+    <Style Selector="Border.aiMessage.light">
+        <Setter Property="Background" Value="#F1F1F1"/>
+    </Style>
+  
+    <Style Selector="Control.dark">
+        <Setter Property="TextBlock.Foreground" Value="#E0E0E0"/>
+    </Style>
+    <Style Selector="Border.dark">
+        <Setter Property="Background" Value="#212121"/>
+    </Style>
+    <Style Selector="TextBox.dark">
+        <Setter Property="Background" Value="#424242"/>
+        <Setter Property="Foreground" Value="#E0E0E0"/>
+    </Style>
+    <Style Selector="Button.dark">
+        <Setter Property="Background" Value="#1976D2"/>
+        <Setter Property="Foreground" Value="#E0E0E0"/>
+    </Style>
+    <Style Selector="Border.userMessage.dark">
+        <Setter Property="Background" Value="#1A237E"/>
+    </Style>
+    <Style Selector="Border.aiMessage.dark">
+        <Setter Property="Background" Value="#424242"/>
+    </Style>
+</Styles>

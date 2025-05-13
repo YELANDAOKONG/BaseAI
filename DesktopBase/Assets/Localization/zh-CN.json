@@ -1,0 +1,32 @@
+{
+  "App": {
+    "Title": "AI 助手",
+    "Settings": "设置",
+    "Chat": "对话"
+  },
+  "Chat": {
+    "InputPlaceholder": "在此输入您的消息...",
+    "Send": "发送",
+    "SystemPromptLabel": "系统提示词",
+    "SystemPromptPlaceholder": "你是一个有帮助的助手...",
+    "ModelSettings": "模型设置",
+    "Temperature": "温度",
+    "ClearChat": "清空对话",
+    "UserMessage": "你",
+    "AIMessage": "AI"
+  },
+  "Settings": {
+    "Language": "语言",
+    "English": "英文",
+    "Chinese": "中文",
+    "Theme": "主题",
+    "Light": "明亮",
+    "Dark": "暗黑",
+    "APISettings": "API 设置",
+    "ApiKey": "API 密钥",
+    "ApiKeyPlaceholder": "输入您的 API 密钥",
+    "ModelType": "模型类型",
+    "MaxTokens": "最大令牌数",
+    "Save": "保存"
+  }
+}
